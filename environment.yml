@@ -1,7 +1,7 @@
 channels:
   - conda-forge
 dependencies:
-  - ipykernel
+  - python==3.12.13
   - pandas[version=">=2.2,<3"]
   - conda-forge::scanpy
   - conda-forge::squidpy
