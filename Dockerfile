@@ -45,8 +45,8 @@ run conda config --set auto_activate_base false
 copy environment.yml /opt/latch/environment.yaml
 run mamba env create \
     --file /opt/latch/environment.yaml \
-    --name cosmx
-env PATH=/opt/conda/envs/cosmx/bin:$PATH
+    --name environment
+env PATH=/opt/conda/envs/environment/bin:$PATH
 
 # Copy workflow data (use .dockerignore to skip files)
 copy . /root/
