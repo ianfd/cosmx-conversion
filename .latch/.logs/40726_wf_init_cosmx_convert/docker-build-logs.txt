@@ -1,0 +1,36 @@
+Step 1/12 : from 812206152185.dkr.ecr.us-west-2.amazonaws.com/latch-base:cb01-main
+ ---> 507607c2b5ea
+Step 2/12 : workdir /tmp/docker-build/work/
+ ---> Using cache
+ ---> 3b5eb2da1ce3
+Step 3/12 : shell [     "/usr/bin/env", "bash",     "-o", "errexit",     "-o", "pipefail",     "-o", "nounset",     "-o", "verbose",     "-o", "errtrace",     "-O", "inherit_errexit",     "-O", "shift_verbose",     "-c" ]
+ ---> Using cache
+ ---> 2af6bafaff25
+Step 4/12 : env TZ='Etc/UTC'
+ ---> Using cache
+ ---> 5b7579be9ce0
+Step 5/12 : env LANG='en_US.UTF-8'
+ ---> Using cache
+ ---> 5740eabe5ff3
+Step 6/12 : arg DEBIAN_FRONTEND=noninteractive
+ ---> Using cache
+ ---> 6aedbe938026
+Step 7/12 : run pip install latch==2.69.1
+ ---> Using cache
+ ---> e6492f63d021
+Step 8/12 : run mkdir /opt/latch
+ ---> Using cache
+ ---> 006c02d72a0b
+Step 9/12 : copy . /root/
+ ---> 1d593c51e2fd
+Step 10/12 : arg tag
+ ---> Running in 502f665413c1
+ ---> 771b0857c2d6
+Step 11/12 : env FLYTE_INTERNAL_IMAGE $tag
+ ---> Running in 74c2b5fc4c54
+ ---> 8018367c13eb
+Step 12/12 : workdir /root
+ ---> Running in 7fde8b56babb
+ ---> 645659b63dda
+Successfully built 645659b63dda
+Successfully tagged 812206152185.dkr.ecr.us-west-2.amazonaws.com/40726_wf_init_cosmx_convert:0.0.0-staging-2ed759-wip-789410

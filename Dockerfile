@@ -25,6 +25,29 @@ arg DEBIAN_FRONTEND=noninteractive
 run pip install latch==2.69.1
 run mkdir /opt/latch
 
+# Install Mambaforge
+run apt-get update --yes && \
+    apt-get install --yes curl git && \
+    curl \
+        --location \
+        --fail \
+        --remote-name \
+        https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh && \
+    `# Docs for -b and -p flags: https://docs.anaconda.com/anaconda/install/silent-mode/#linux-macos` \
+    bash Miniforge3-Linux-x86_64.sh -b -p /opt/conda -u && \
+    rm Miniforge3-Linux-x86_64.sh
+
+# Set conda PATH
+env PATH=/opt/conda/bin:$PATH
+run conda config --set auto_activate_base false
+
+# Build conda environment
+copy environment.yml /opt/latch/environment.yaml
+run mamba env create \
+    --file /opt/latch/environment.yaml \
+    --name cosmx
+env PATH=/opt/conda/envs/cosmx/bin:$PATH
+
 # Copy workflow data (use .dockerignore to skip files)
 copy . /root/
 

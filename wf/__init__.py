@@ -8,7 +8,7 @@ from latch.types.metadata import LatchAuthor, LatchMetadata, LatchParameter
 
 
 metadata = LatchMetadata(
-    display_name="CosMx Conversion + Statistics",
+    display_name="CosMx Conversion and Statistics",
     author=LatchAuthor(
         name="Ian",
     ),
