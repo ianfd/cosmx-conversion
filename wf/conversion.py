@@ -10,9 +10,9 @@ from extra import loading_utils
 
 @medium_task
 def cosmx_convert_with_stats_gen(
-    expr_mat: LatchFile,
+    sample_tar_gz: LatchFile,
     sample_name: str,
-    output_dir: LatchDir
+    output_dir: LatchOutputDir
 ) -> LatchOutputDir:
     
     import scanpy as sc
@@ -28,7 +28,7 @@ def cosmx_convert_with_stats_gen(
 
     safe_name = sample_name # manipulate top level, not here!
 
-    p = expr_mat.local_path
+    p = sample_tar_gz.local_path
     adata = loading_utils.read_full_sample(sample_name, p, local_workdir)
     adata.var["negprobes"] = adata.var_names.str.startswith("SystemControl")
     sc.pp.calculate_qc_metrics(adata, qc_vars=["negprobes"], inplace=True)

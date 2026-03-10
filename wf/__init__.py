@@ -1,94 +1,73 @@
-"""
-Assemble and sort some COVID reads...
-"""
-from wf.assemble import assembly_task
-from wf.sort import sort_bam_task
+from wf.conversion import cosmx_convert_with_stats_gen
 
 from latch.resources.launch_plan import LaunchPlan
 from latch.resources.workflow import workflow
-from latch.types.directory import LatchOutputDir
+from latch.types.directory import LatchDir, LatchOutputDir
 from latch.types.file import LatchFile
-from latch.types.metadata import LatchAuthor, LatchMetadata, LatchParameter, LatchRule
+from latch.types.metadata import LatchAuthor, LatchMetadata, LatchParameter
 
-"""The metadata included here will be injected into your interface."""
+
 metadata = LatchMetadata(
-    display_name="Assemble and Sort FastQ Files",
-    documentation="your-docs.dev",
+    display_name="CosMx Conversion + Statistics",
     author=LatchAuthor(
-        name="Author",
-        email="author@gmail.com",
-        github="github.com/author",
+        name="Ian",
     ),
-    repository="https://github.com/your-repo",
-    license="MIT",
     parameters={
-        "read1": LatchParameter(
-            display_name="Read 1",
-            description="Paired-end read 1 file to be assembled.",
-            batch_table_column=True,  # Show this parameter in batched mode.
-            rules=[
-                # validate the input file using regex
-                LatchRule(
-                    regex="(.fastq|.fastq.gz|.fq|.fq.gz)$",
-                    message="Only fastq, fastq.gz, fq, fq.gz extensions are valid",
-                )
-            ],
+        "expr_mat": LatchParameter(
+            display_name="Expression Matrix",
+            description="CosMx compressed flat file export (.tar.gz or similar).",
+            batch_table_column=True,
         ),
-        "read2": LatchParameter(
-            display_name="Read 2",
-            description="Paired-end read 2 file to be assembled.",
-            batch_table_column=True,  # Show this parameter in batched mode.
-            rules=[
-                LatchRule(
-                    regex="(.fastq|.fastq.gz|.fq|.fq.gz)$",
-                    message="Only fastq, fastq.gz, fq, fq.gz extensions are valid",
-                )
-            ],
+        "sample_name": LatchParameter(
+            display_name="Sample Name",
+            description="Name used for output file naming.",
+            batch_table_column=True,
         ),
-        "output_directory": LatchParameter(
+        "output_dir": LatchParameter(
             display_name="Output Directory",
-            description="Where to place the result file.",
-            batch_table_column=True,  # Show this parameter in batched mode.
+            description="Latch path for H5AD and statistics output.",
+            batch_table_column=True,
         ),
     },
-    tags=[],
 )
 
 
 @workflow(metadata)
-def assemble_and_sort(
-    read1: LatchFile, read2: LatchFile, output_directory: LatchOutputDir
-) -> LatchFile:
-    """Description...
-
-    markdown header
-    ----
-
-    Write some documentation about your workflow in
-    markdown here:
-
-    > Regular markdown constructs work as expected.
-
-    # Heading
-
-    * content1
-    * content2
+def cosmx_convert(
+    expr_mat: LatchFile,
+    sample_name: str,
+    output_dir: LatchOutputDir = LatchDir("latch://40726.account/cosmx-test/out-dir"),
+) -> LatchOutputDir:
     """
-    sam = assembly_task(read1=read1, read2=read2, output_directory=output_directory)
-    return sort_bam_task(sam=sam, output_directory=output_directory)
+    ## CosMx Conversion + Statistics Generation
+
+    Converts raw CosMx flat file exports into H5AD format
+    and generates pre-QC statistics for inspection in Latch Plots.
+
+    ### Steps
+    1. Extract and load CosMx data with squidpy
+    2. Compute QC metrics (total counts, genes detected, negative probes, protein markers)
+    3. Generate per-cell, per-FOV, protein, and summary statistics CSVs
+    4. Save H5AD with raw counts preserved
+
+    ### Outputs
+    - `{sample_name}.h5ad` — raw AnnData with QC metrics in obs
+    - `stats/` — pre-filter statistics CSVs for visualization in Plots
+    """
+    return cosmx_convert_with_stats_gen(
+        expr_mat=expr_mat,
+        sample_name=sample_name,
+        output_dir=output_dir,
+    )
 
 
-"""
-Add test data with a LaunchPlan. Provide default values in a dictionary with
-the parameter names as the keys. These default values will be available under
-the 'Test Data' dropdown at console.latch.bio.
-"""
+
 LaunchPlan(
-    assemble_and_sort,
+    cosmx_convert,
     "Test Data",
     {
-        "read1": LatchFile("s3://latch-public/init/r1.fastq"),
-        "read2": LatchFile("s3://latch-public/init/r2.fastq"),
-        "output_directory": LatchOutputDir("latch:///assemble_and_sort_outputs"),
-    },
+        "expr_mat": LatchFile("latch://40726.account/cosmx-test/GSE282193_Slide1.tar.gz"),
+        "sample_name": "GSE282193_Slide1",
+        "output_dir": LatchDir("latch://40726.account/cosmx-test/out-dir/conv/GSE282193_Slide1"),
+    }
 )
