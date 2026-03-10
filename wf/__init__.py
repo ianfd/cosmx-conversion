@@ -36,7 +36,7 @@ metadata = LatchMetadata(
 def cosmx_convert(
     sample_tar_gz: LatchFile,
     sample_name: str,
-    output_dir: LatchOutputDir = LatchDir("latch://40726.account/cosmx-test/out-dir"),
+    output_dir: LatchDir = LatchDir("latch://40726.account/cosmx-test/out-dir"),
 ) -> LatchOutputDir:
     """
     ## CosMx Conversion + Statistics Generation

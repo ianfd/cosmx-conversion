@@ -12,7 +12,7 @@ from extra import loading_utils
 def cosmx_convert_with_stats_gen(
     sample_tar_gz: LatchFile,
     sample_name: str,
-    output_dir: LatchOutputDir
+    output_dir: LatchDir
 ) -> LatchOutputDir:
     
     import scanpy as sc
