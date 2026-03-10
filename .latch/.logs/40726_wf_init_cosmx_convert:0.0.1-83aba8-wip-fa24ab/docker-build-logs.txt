@@ -40,15 +40,15 @@ Step 14/18 : env PATH=/opt/conda/envs/environment/bin:$PATH
  ---> Using cache
  ---> 99416dcd6056
 Step 15/18 : copy . /root/
- ---> f6bde7d1f168
+ ---> 81c977d89022
 Step 16/18 : arg tag
- ---> Running in 40898b51b2c6
- ---> 04a81cf15a14
+ ---> Running in 0bbfc3f3ae20
+ ---> def011393e6c
 Step 17/18 : env FLYTE_INTERNAL_IMAGE $tag
- ---> Running in 6bc91b9dc192
- ---> 65aaebdb7487
+ ---> Running in b518a26ec981
+ ---> 3a626597e0fb
 Step 18/18 : workdir /root
- ---> Running in c2ae0084bcbe
- ---> 09bac392598f
-Successfully built 09bac392598f
-Successfully tagged 812206152185.dkr.ecr.us-west-2.amazonaws.com/40726_wf_init_cosmx_convert:0.0.1-staging-83aba8-002098
+ ---> Running in 041ec88f8deb
+ ---> 2476e184f3b8
+Successfully built 2476e184f3b8
+Successfully tagged 812206152185.dkr.ecr.us-west-2.amazonaws.com/40726_wf_init_cosmx_convert:0.0.1-83aba8-wip-fa24ab

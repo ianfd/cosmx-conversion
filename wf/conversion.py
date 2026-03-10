@@ -17,6 +17,8 @@ def cosmx_convert_with_stats_gen(
     
     import scanpy as sc
     import pandas as pd
+    import anndata as ad
+    ad.settings.allow_write_nullable_strings = True
     import json
 
     local_out = Path("/root/cosmx_qc_output")
@@ -41,7 +43,7 @@ def cosmx_convert_with_stats_gen(
     adata.layers["counts"] = adata.X.copy()
     adata.write_h5ad(local_out / f"{safe_name}.h5ad")
 
-    return LatchDir(local_out, output_dir)
+    return LatchDir(local_out, f"{output_dir.remote_directory}/{sample_name}")
 
 
 def _save_cell_stats(
