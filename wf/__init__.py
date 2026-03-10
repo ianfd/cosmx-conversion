@@ -13,8 +13,8 @@ metadata = LatchMetadata(
         name="Ian",
     ),
     parameters={
-        "expr_mat": LatchParameter(
-            display_name="Expression Matrix",
+        "sample_tar_gz": LatchParameter(
+            display_name="Compressed CosMx Sample File",
             description="CosMx compressed flat file export (.tar.gz or similar).",
             batch_table_column=True,
         ),
@@ -34,7 +34,7 @@ metadata = LatchMetadata(
 
 @workflow(metadata)
 def cosmx_convert(
-    expr_mat: LatchFile,
+    sample_tar_gz: LatchFile,
     sample_name: str,
     output_dir: LatchOutputDir = LatchDir("latch://40726.account/cosmx-test/out-dir"),
 ) -> LatchOutputDir:
@@ -55,7 +55,7 @@ def cosmx_convert(
     - `stats/` — pre-filter statistics CSVs for visualization in Plots
     """
     return cosmx_convert_with_stats_gen(
-        expr_mat=expr_mat,
+        sample_tar_gz=sample_tar_gz,
         sample_name=sample_name,
         output_dir=output_dir,
     )
@@ -66,7 +66,7 @@ LaunchPlan(
     cosmx_convert,
     "Test Data",
     {
-        "expr_mat": LatchFile("latch://40726.account/cosmx-test/GSE282193_Slide1.tar.gz"),
+        "sample_tar_gz": LatchFile("latch://40726.account/cosmx-test/GSE282193_Slide1.tar.gz"),
         "sample_name": "GSE282193_Slide1",
         "output_dir": LatchDir("latch://40726.account/cosmx-test/out-dir/conv/GSE282193_Slide1"),
     }
