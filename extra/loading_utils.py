@@ -88,7 +88,6 @@ def cosmx_simple(
     gene_cols = [c for c in counts_df.columns if c not in [cell_id_key, fov_key, instance_key]]
     counts_df = counts_df.set_index(instance_key)[gene_cols]
 
-    # Convert all nullable/extension dtypes to plain numpy for h5ad compatibility
     for col in obs_df.columns:
         s = obs_df[col]
         if isinstance(s.dtype, pd.CategoricalDtype):
@@ -105,13 +104,11 @@ def cosmx_simple(
 
     common_index = obs_df.index.intersection(counts_df.index)
 
-    # Extract dense values and gene names, then free the DataFrame
     counts_values = counts_df.loc[common_index, :].values
     gene_names = counts_df.columns.astype(object)
     del counts_df
     gc.collect()
 
-    # Build sparse matrix, then free the dense array
     X = csr_matrix(counts_values)
     del counts_values
     gc.collect()
