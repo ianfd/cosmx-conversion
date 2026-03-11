@@ -10,9 +10,7 @@ from extra import loading_utils
 
 @medium_task
 def cosmx_convert_with_stats_gen(
-    sample_tar_gz: LatchFile,
-    sample_name: str,
-    output_dir: LatchDir
+    input: loading_utils.ConvertInput
 ) -> LatchOutputDir:
     
     import scanpy as sc
@@ -28,10 +26,10 @@ def cosmx_convert_with_stats_gen(
     path_out.mkdir(exist_ok=True)
     local_workdir.mkdir(exist_ok=True)
 
-    safe_name = sample_name # manipulate top level, not here!
+    safe_name = input.sample_name # manipulate top level, not here!
 
-    p = sample_tar_gz.local_path
-    adata = loading_utils.read_full_sample(sample_name, p, local_workdir)
+    p = input.file.local_path
+    adata = loading_utils.read_full_sample(safe_name, p, local_workdir)
     adata.var["negprobes"] = adata.var_names.str.startswith("SystemControl")
     sc.pp.calculate_qc_metrics(adata, qc_vars=["negprobes"], inplace=True)
 
@@ -43,7 +41,7 @@ def cosmx_convert_with_stats_gen(
     adata.layers["counts"] = adata.X.copy()
     adata.write_h5ad(local_out / f"{safe_name}.h5ad")
 
-    return LatchDir(local_out, f"{output_dir.remote_directory}/{sample_name}")
+    return LatchDir(local_out, f"{input.output_dir.remote_directory}/{safe_name}")
 
 
 def _save_cell_stats(

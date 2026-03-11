@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import os
 import re
 from pathlib import Path
@@ -10,12 +8,22 @@ import tarfile
 import gzip
 import shutil
 
-
+from latch.types.directory import LatchDir, LatchOutputDir
+from latch.types.file import LatchFile
 import io
 
 import pandas as pd
 from anndata import AnnData
 from scipy.sparse import csr_matrix
+
+from dataclasses import dataclass
+
+
+@dataclass
+class ConvertInput:
+    sample_name: str
+    file: LatchFile
+    output_dir: LatchDir
 
 if TYPE_CHECKING:
     from dask.dataframe import DataFrame as DaskDataFrame

@@ -1,7 +1,7 @@
-from typing import List
+from typing import Dict, List
 
 from wf.conversion import cosmx_convert_with_stats_gen
-from dataclasses import dataclass
+
 from latch.resources.launch_plan import LaunchPlan
 from latch.resources.workflow import workflow
 from latch.types.directory import LatchDir, LatchOutputDir
@@ -9,13 +9,7 @@ from latch.types.file import LatchFile
 from latch.types.metadata import LatchAuthor, LatchMetadata, LatchParameter
 from latch.resources.tasks import small_task, medium_task
 from latch.resources.map_tasks import map_task 
-
-
-@dataclass
-class ConvertInput:
-    sample_name: str
-    file: LatchFile
-    output_dir: LatchDir
+import extra.loading_utils
 
 
 metadata = LatchMetadata(
@@ -24,9 +18,9 @@ metadata = LatchMetadata(
         name="Ian",
     ),
     parameters={
-        "samples": LatchParameter(
-            display_name="Dictionary of Sample Name and LatchFile",
-            description="Dictionary of Sample Name and LatchFile (CosMx compressed tar.gz)",
+        "sample_files": LatchParameter(
+            display_name="List of Sample Files ",
+            description="Dictionary of Sample Files",
             batch_table_column=True,
         ),
         "output_dir_base": LatchParameter(
@@ -68,26 +62,30 @@ metadata = LatchMetadata(
 
 
 @small_task
-def prep_args_for_multi(samples: dict[str, LatchFile], base_dir: LatchDir):
-    return [ConvertInput(k,v, base_dir) for k,v in samples.items()]
+def prep_args_for_multi(sample_files: List[str],
+    sample_names: List[str], base_dir: LatchDir) -> List[extra.loading_utils.ConvertInput]:
+    
+    return [extra.loading_utils.ConvertInput(k, LatchFile(v), base_dir) for k,v in zip(sample_names, sample_files)]
 
 @workflow(metadata)
 def cosmx_convert_multi(
-    samples: dict[str, LatchFile],
+    sample_files: List[str],
+    sample_names: List[str],
     output_dir_base: LatchDir = LatchDir("latch://40726.account/cosmx-test/out-dir"),
 ) -> List[LatchOutputDir]:
 
-    prepped_args = prep_args_for_multi(samples, output_dir_base)
+    prepped_args = prep_args_for_multi(sample_files=sample_files, sample_names=sample_names, base_dir=output_dir_base)
 
-    return map_task(cosmx_convert_with_stats_gen)(prepped_args)
+    mapped_out = map_task(cosmx_convert_with_stats_gen)(input=prepped_args)
+    return mapped_out
 
 
 LaunchPlan(
     cosmx_convert_multi,
     "Test Data",
     {
-        "sample_tar_gz": LatchFile("latch://40726.account/cosmx-test/GSE282193_Slide1.tar.gz"),
-        "sample_name": "GSE282193_Slide1",
-        "output_dir": LatchDir("latch://40726.account/cosmx-test/out-dir/conv/GSE282193_Slide1"),
+        "sample_names": ["GSE282193_Slide1"],
+        "sample_files": ["latch://40726.account/cosmx-test/GSE282193_Slide1.tar.gz"],
+        "output_dir_base": LatchDir("latch://40726.account/cosmx-testf/out-dir/conv/"),
     }
 )
