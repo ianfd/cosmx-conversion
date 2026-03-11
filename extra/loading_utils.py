@@ -21,9 +21,9 @@ from dataclasses import dataclass
 
 @dataclass
 class ConvertInput:
-    sample_name: str
     file: LatchFile
     output_dir: LatchDir
+    sample_name: str
 
 if TYPE_CHECKING:
     from dask.dataframe import DataFrame as DaskDataFrame
@@ -155,8 +155,14 @@ def extract_files(input_file: str, work_dir: str | Path) -> str:
     tar_extract_dir = temp_dir / "tar_contents"
     tar_extract_dir.mkdir(parents=True, exist_ok=True)
 
-    with tarfile.open(sample_path, "r:gz") as tar:
-        tar.extractall(path=tar_extract_dir)
+    try:
+        with tarfile.open(sample_path, "r:gz") as tar:
+            tar.extractall(path=tar_extract_dir)
+    except tarfile.ReadError:
+        # Not a gzip tarball — copy the file directly into temp_dir
+        shutil.copy2(sample_path, temp_dir / sample_path.name)
+        shutil.rmtree(tar_extract_dir, ignore_errors=True)
+        return str(temp_dir)
 
     csv_gz_files = list(tar_extract_dir.rglob("*.csv.gz"))
     for gz_file in csv_gz_files:
@@ -175,7 +181,6 @@ def prep_fov_file(sample_folder: str):
     target_file = ""
 
     for f in os.listdir(sample_folder):
-        #print(f) debug
         if f.endswith("_fov_positions_file.csv"):
             target_file = f
     

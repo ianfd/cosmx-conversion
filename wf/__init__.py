@@ -65,7 +65,7 @@ metadata = LatchMetadata(
 def prep_args_for_multi(sample_files: List[str],
     sample_names: List[str], base_dir: LatchDir) -> List[extra.loading_utils.ConvertInput]:
     
-    return [extra.loading_utils.ConvertInput(k, LatchFile(v), base_dir) for k,v in zip(sample_names, sample_files)]
+    return [extra.loading_utils.ConvertInput(file=LatchFile(v), output_dir=base_dir, sample_name=k) for k,v in zip(sample_names, sample_files)]
 
 @workflow(metadata)
 def cosmx_convert_multi(
